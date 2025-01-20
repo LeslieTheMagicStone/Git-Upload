@@ -2,7 +2,11 @@
 Upload local directory to github with specified .gitignore
 
 ## Setup
-Installation:
+
+### Install GitHub CLI
+If you haven't installed the GitHub CLI, follow the instructions [here](https://github.com/cli/cli#installation).
+
+### Installation
 ```bash
 ./install.sh
 ```
