@@ -14,5 +14,12 @@ If you haven't installed the GitHub CLI, follow the instructions [here](https://
 `~/.gitupload/gitignore-template`
 
 ## Example Usage
+Upload `~/UnityProjects/GuichuStarFight` to github as a **p**ublic repository and add .git**i**gnore file and **r**eadme file.
 ```bash
-gitupload --public ~/Documents/UnityProjects/GuichuStarFight
+gitupload -pir ~/UnityProjects/GuichuStarFight
+```
+
+Display the help message
+```bash
+gitupload -h
+```

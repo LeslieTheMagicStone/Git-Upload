@@ -1,25 +1,52 @@
-dir_path=""
-visibility="private"
+#!/bin/bash
 
-# Parse arguments
-for arg in "$@"; do
-  case $arg in
-    --public)
+# Function to display usage
+usage() {
+  echo "Usage: $0 [-p] [-r] [-i] [-h] directory"
+  echo "  -p             Set the repository visibility to public"
+  echo "  -r             Include README template"
+  echo "  -i             Include .gitignore template"
+  echo "  -h             Display this help message"
+  exit 0 
+}
+
+# Default values
+visibility="private"
+include_readme=false
+include_gitignore=false
+
+# Parse options
+while getopts ":prih" opt; do
+  case ${opt} in
+    p )
       visibility="public"
       ;;
-    --private)
-      visibility="private"
+    r )
+      include_readme=true
       ;;
-    *)
-      dir_path=$arg
+    i )
+      include_gitignore=true
+      ;;
+    h )
+      usage
+      ;;
+    \? )
+      echo "Invalid option: -$OPTARG" 1>&2
+      usage
+      ;;
+    : )
+      echo "Invalid option: -$OPTARG requires an argument" 1>&2
+      usage
       ;;
   esac
 done
+shift $((OPTIND -1))
 
 # Ensure dir_path is provided
+dir_path=$1
 if [ -z "$dir_path" ]; then
   echo "Directory path is required"
-  exit 1
+  usage
 fi
 
 # Open directory at dir_path
@@ -53,13 +80,13 @@ if ! git remote get-url origin &> /dev/null; then
   git remote add origin "https://github.com/$github_username/$(basename "$dir_path").git"
 fi
 
-# Add README.md if it doesn't exist
-if [ ! -f "README.md" ]; then
+# Add README.md if it doesn't exist and the option is set
+if [ "$include_readme" = true ] && [ ! -f "README.md" ]; then
   echo "# $(basename "$dir_path")" > README.md
 fi
 
-# Add .gitignore if it doesn't exist
-if [ ! -f ".gitignore" ]; then
+# Add .gitignore if it doesn't exist and the option is set
+if [ "$include_gitignore" = true ] && [ ! -f ".gitignore" ]; then
   if [ -f "$HOME/.gitupload/gitignore-template" ]; then
     cp "$HOME/.gitupload/gitignore-template" .gitignore
   fi
