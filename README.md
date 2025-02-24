@@ -19,7 +19,12 @@ Upload `~/UnityProjects/GuichuStarFight` to github as a **p**ublic repository an
 gitupload -pir ~/UnityProjects/GuichuStarFight
 ```
 
-Display the help message
+Upload `./foo` to github as a (private) repository named `bar` (without adding .gitignore file and readme file).
+```bash
+gitupload ./foo bar
+```
+
+Display the help message.
 ```bash
 gitupload -h
 ```

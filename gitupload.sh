@@ -2,11 +2,13 @@
 
 # Function to display usage
 usage() {
-  echo "Usage: $0 [-p] [-r] [-i] [-h] directory"
+  echo "Usage: $0 [-p] [-r] [-i] [-h] directory [repository]"
   echo "  -p             Set the repository visibility to public"
   echo "  -r             Include README template"
   echo "  -i             Include .gitignore template"
   echo "  -h             Display this help message"
+  echo "  directory      Local directory to upload"
+  echo "  repository     (Optional) Name of the GitHub repository"
   exit 0 
 }
 
@@ -49,6 +51,12 @@ if [ -z "$dir_path" ]; then
   usage
 fi
 
+# Set repository name
+repo_name=$2
+if [ -z "$repo_name" ]; then
+  repo_name=$(basename "$dir_path")
+fi
+
 # Open directory at dir_path
 cd "$dir_path" || { echo "Directory not found"; exit 1; }
 
@@ -67,22 +75,22 @@ fi
 github_username=$(gh auth status --show-token | awk '/Logged in to github.com account/ {print $7}')
 
 # Check if remote repository exists using GitHub CLI
-if ! gh repo view "$(basename "$dir_path")" &> /dev/null; then
+if ! gh repo view "$repo_name" &> /dev/null; then
   # Create GitHub repository if it doesn't exist
-  gh repo create "$(basename "$dir_path")" --"$visibility" --source=. --remote=origin
+  gh repo create "$repo_name" --"$visibility" --source=. --remote=origin
 else
   # Set the remote origin if the repository already exists
-  git remote add origin "https://github.com/$github_username/$(basename "$dir_path").git"
+  git remote add origin "https://github.com/$github_username/$repo_name.git"
 fi
 
 # Ensure the remote origin is set correctly
 if ! git remote get-url origin &> /dev/null; then
-  git remote add origin "https://github.com/$github_username/$(basename "$dir_path").git"
+  git remote add origin "https://github.com/$github_username/$repo_name.git"
 fi
 
 # Add README.md if it doesn't exist and the option is set
 if [ "$include_readme" = true ] && [ ! -f "README.md" ]; then
-  echo "# $(basename "$dir_path")" > README.md
+  echo "# $repo_name" > README.md
 fi
 
 # Add .gitignore if it doesn't exist and the option is set
