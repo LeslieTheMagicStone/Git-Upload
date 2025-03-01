@@ -54,7 +54,16 @@ fi
 # Set repository name
 repo_name=$2
 if [ -z "$repo_name" ]; then
-  repo_name=$(basename "$dir_path")
+  # Handle various path edge cases
+  if [ "$dir_path" = "." ]; then
+    repo_name=$(basename "$(pwd)")
+  elif [[ "$dir_path" == ".." || "$dir_path" == "../"* || "$dir_path" == *"/.."* ]]; then
+    # For paths with "..", resolve to absolute path first
+    abs_path=$(cd "$dir_path" && pwd)
+    repo_name=$(basename "$abs_path")
+  else
+    repo_name=$(basename "$dir_path")
+  fi
 fi
 
 # Open directory at dir_path
